@@ -6,7 +6,7 @@ Monitor for disk IO
 
 ## Introduction
 
-`diskgraph nvme0n1` will show you the IO use of your first nvme disk.
+The diskgraph tool will graph disk IO under linux, in a terminal.
 
 Examples:
 
@@ -29,6 +29,7 @@ Press ESCAPE to stop diskgraph.
 ## Known issues
 
 * Missing manual page.
+* Assumes 512 byte sectors.
 * If sleep interval is not exact, the BW computation will be off.
 
 ## Copyright
