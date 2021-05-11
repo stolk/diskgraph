@@ -307,7 +307,9 @@ static void set_postscript(const char* devname)
 	assert( f );
 	char nm[128];
 	memset(nm, 1, sizeof(nm));
-	fread( nm, 1, sizeof(nm), f );
+	int l = fread( nm, 1, sizeof(nm), f );
+	if ( l>0 && l<sizeof(nm) && nm[l-1] < 32 )
+		nm[l-1] = 0;
 	fclose(f);
 	
 	snprintf
