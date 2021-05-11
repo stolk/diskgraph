@@ -75,14 +75,15 @@ static void set_console_mode()
 #endif
 
 
-typedef uint32_t measurement_t[3];
-
+// History of statistics.
 #define MAXHIST		320
+typedef uint32_t measurement_t[3];
 measurement_t hist[ MAXHIST ];
 uint32_t head=0;
 uint32_t tail=0;
-uint32_t maxbw=8192;
-uint32_t maxif=16;
+
+uint32_t maxbw=8192;	// top of the left-hand scale: bandwidth in sectors per second.
+uint32_t maxif=16;	// top of the right-hand scale: operation count.
 
 
 static void setup_image(void)
@@ -293,22 +294,22 @@ void get_stats( char* fname )
 	);
 	assert( numv == 15 );
 
-	uint32_t rd = v[2];
-	uint32_t wr = v[6];
+	uint32_t rd = v[2];	// number of sectors read.
+	uint32_t wr = v[6];	// number of sectors written.
 	if ( firstrun )
 	{
 		cur_rd = rd;
 		cur_wr = wr;
 		firstrun=0;
 	}
-	dif_rd = rd - cur_rd;
-	dif_wr = wr - cur_wr;
+	dif_rd = rd - cur_rd;	// number of sectors read since last time.
+	dif_wr = wr - cur_wr;	// number of sectors written since last time.
 	cur_rd = rd;
 	cur_wr = wr;
-	cur_if = v[8];
+	cur_if = v[8];		// number of operations in flight.
 
-	hist[tail][0] = (uint32_t) ( dif_rd / period );
-	hist[tail][1] = (uint32_t) ( dif_wr / period );
+	hist[tail][0] = (uint32_t) ( dif_rd / period );	// sectors read per second.
+	hist[tail][1] = (uint32_t) ( dif_wr / period );	// sectors written per second.
 	hist[tail][2] = cur_if;
 	tail = (tail+1) % MAXHIST;
 	if ( tail == head )
@@ -423,8 +424,8 @@ int main( int argc, char* argv[] )
 		int overflow_bw=0;
 		int overflow_if=0;
 
-		uint32_t quarter_bw = maxbw * 512 / ( 4 * 1024 * 1024 );
-		uint32_t quarter_if = maxif / 4;
+		uint32_t quarter_bw = maxbw * 512 / ( 4 * 1024 * 1024 );	// A quarter of the max bandwidth, in bytes/sec.
+		uint32_t quarter_if = maxif / 4;				// A quarter of the max operations count.
 
 		snprintf( legend + imw*(      1) + 1, 80, "%d MeB/s", 4*quarter_bw );
 		snprintf( legend + imw*(imh/8*1) + 1, 80, "%d MeB/s", 3*quarter_bw );
