@@ -30,7 +30,6 @@ Press ESCAPE to stop diskgraph.
 
 * Missing manual page.
 * Assumes 512 byte sectors.
-* If sleep interval is not exact, the BW computation will be off.
 
 ## Copyright
 

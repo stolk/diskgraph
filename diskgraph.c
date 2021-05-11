@@ -29,6 +29,8 @@ static char postscript[256];
 
 static int resized=1;
 
+static double period=0;
+
 
 #if defined(_WIN64)
 #	include <windows.h>
@@ -239,6 +241,24 @@ static void print_image_double_res( int w, int h, unsigned char* data, char* leg
 }
 
 
+double elapsed_ms_since_last_call( void )
+{
+	static int virgin = 1;
+	static struct timespec prev;
+	struct timespec curr;
+	if ( virgin )
+	{
+		clock_gettime( CLOCK_MONOTONIC, &prev );
+		virgin = 0;
+	}
+	clock_gettime( CLOCK_MONOTONIC, &curr );
+	const double delta_sec  = curr.tv_sec  - prev.tv_sec;
+	const double delta_nsec = curr.tv_nsec - prev.tv_nsec;
+	const double delta = delta_sec*1000 + delta_nsec/1e6;
+	prev = curr;
+	return delta;
+}
+
 
 uint32_t cur_rd;
 uint32_t cur_wr;
@@ -254,8 +274,13 @@ void get_stats( char* fname )
 	FILE* f = fopen( fname, "rb" );
 	assert( f );
 	char info[16384];
+
 	const int numr = fread( info, 1, sizeof(info), f );
 	assert( numr > 0 );
+
+	period = 0.001 * elapsed_ms_since_last_call();
+	period = period < 0.001 ? 1 : period;
+
 	fclose(f);
 	f=0;
 
@@ -282,8 +307,8 @@ void get_stats( char* fname )
 	cur_wr = wr;
 	cur_if = v[8];
 
-	hist[tail][0] = dif_rd;
-	hist[tail][1] = dif_wr;
+	hist[tail][0] = (uint32_t) ( dif_rd / period );
+	hist[tail][1] = (uint32_t) ( dif_wr / period );
 	hist[tail][2] = cur_if;
 	tail = (tail+1) % MAXHIST;
 	if ( tail == head )
@@ -398,7 +423,7 @@ int main( int argc, char* argv[] )
 		int overflow_bw=0;
 		int overflow_if=0;
 
-		uint32_t quarter_bw = maxbw * 5 * 512 / ( 4 * 1024 * 1024 );
+		uint32_t quarter_bw = maxbw * 512 / ( 4 * 1024 * 1024 );
 		uint32_t quarter_if = maxif / 4;
 
 		snprintf( legend + imw*(      1) + 1, 80, "%d MeB/s", 4*quarter_bw );
