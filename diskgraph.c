@@ -272,8 +272,14 @@ void get_stats( char* fname )
 {
 	static int firstrun=1;
 
-	FILE* f = fopen( fname, "rb" );
+	static FILE* f = 0;
+	if ( !f )
+		f = fopen( fname, "rb" );
+
 	assert( f );
+
+	fseek( f, 0L, SEEK_SET );
+
 	char info[16384];
 
 	const int numr = fread( info, 1, sizeof(info), f );
@@ -282,8 +288,8 @@ void get_stats( char* fname )
 	period = 0.001 * elapsed_ms_since_last_call();
 	period = period < 0.001 ? 1 : period;
 
-	fclose(f);
-	f=0;
+	//fclose(f);
+	//f=0;
 
 	uint32_t v[15];
 	int numv = sscanf
