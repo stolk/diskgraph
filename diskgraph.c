@@ -395,10 +395,10 @@ int main( int argc, char* argv[] )
 
 		assert( quarter_bw > 0 );
 
-		snprintf( legend + imw * (	  1) + 1, 80, "%d MeB/s", 4 * quarter_bw );
-		snprintf( legend + imw * (imh / 8 * 1) + 1, 80, "%d MeB/s", 3 * quarter_bw );
-		snprintf( legend + imw * (imh / 8 * 2) + 1, 80, "%d MeB/s", 2 * quarter_bw );
-		snprintf( legend + imw * (imh / 8 * 3) + 1, 80, "%d MeB/s", 1 * quarter_bw );
+		snprintf( legend + imw * (	  1) + 1, 80, "%d MiB/s", 4 * quarter_bw );
+		snprintf( legend + imw * (imh / 8 * 1) + 1, 80, "%d MiB/s", 3 * quarter_bw );
+		snprintf( legend + imw * (imh / 8 * 2) + 1, 80, "%d MiB/s", 2 * quarter_bw );
+		snprintf( legend + imw * (imh / 8 * 3) + 1, 80, "%d MiB/s", 1 * quarter_bw );
 
 		char lab0[16];
 		char lab1[16];
