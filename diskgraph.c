@@ -13,6 +13,7 @@
 #include <signal.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <errno.h>
 
 static int termw = 0, termh = 0;
 static int doubleres = 0;
@@ -220,9 +221,14 @@ void get_stats( char* fname )
 
 	static FILE* f = 0;
 	if ( !f )
+	{
 		f = fopen( fname, "rb" );
-
-	assert( f );
+		if ( !f )
+		{
+			fprintf(stderr, "Failed to open %s: %s.\n", fname, strerror(errno));
+			exit(2);
+		}
+	}
 
 	fseek( f, 0L, SEEK_SET );
 
@@ -279,7 +285,11 @@ static void set_postscript(const char* devname)
 	char fname[128];
 	snprintf( fname, sizeof(fname), "/sys/class/block/%s/device/model", devname );
 	FILE* f = fopen( fname, "rb" );
-	assert( f );
+	if ( !f )
+	{
+		fprintf(stderr, "Failed to open %s: %s.\n", fname, strerror(errno));
+		exit(2);
+	}
 	char nm[128];
 	memset(nm, 1, sizeof(nm));
 	int l = fread( nm, 1, sizeof(nm), f );
@@ -322,7 +332,7 @@ int main( int argc, char* argv[] )
 	FILE* f = fopen(fname, "rb");
 	if ( !f )
 	{
-		fprintf( stderr, "Failed to open %s\n", fname );
+		fprintf( stderr, "Failed to open %s: %s.\n", fname, strerror(errno) );
 		exit(2);
 	}
 	fclose(f);
