@@ -1,6 +1,20 @@
-diskgraph: diskgraph.c
-	cc -D_POSIX_C_SOURCE=199309L -std=c99 -Wall -g -o diskgraph diskgraph.c -lm
+CC ?= cc
+CFLAGS = -D_POSIX_C_SOURCE=199309L -std=c99 -Wall
+CXXFLAGS =
+LDFLAGS =
+
+TARGET = diskgraph
+SRC = diskgraph.c
+OBJ = $(SRC:.c=.o)
+
+all:	$(TARGET)
+
+$(TARGET):	$(OBJ)
+	$(CC) $(CFLAGS) $(CXXFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
+
+.c.o:
+	$(CC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f ./diskgraph
-
+	$(RM) *.o $(TARGET)
+	@echo All clean
