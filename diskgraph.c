@@ -247,7 +247,17 @@ void get_stats( char* fname )
 		"%u %u %u %u %u %u %u %u %u %u %u %u %u %u %u",
 		v+0,v+1,v+2,v+3,v+4,v+5,v+6,v+7,v+8,v+9,v+10,v+11,v+12,v+13,v+14
 	);
-	assert( numv == 15 );
+	if ( numv != 15 )
+	{
+		fprintf
+		(
+			stderr,
+			"Did not find all the fields in %s that were expected.\n"
+			"Most likely, your kernel is too old to work with diskgraph.\n",
+			fname
+		);
+		exit(3);
+	}
 
 	uint32_t rd = v[2];	// number of sectors read.
 	uint32_t wr = v[6];	// number of sectors written.
