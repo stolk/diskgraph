@@ -28,6 +28,8 @@ Press ESCAPE or Q to exit diskgraph.
 
 ## Known issues
 
+* Shows garbage on terminals that do not support 24 bit colour.
+* Does not work on older linux kernels.
 * Missing manual page.
 * Assumes 512 byte sectors.
 
