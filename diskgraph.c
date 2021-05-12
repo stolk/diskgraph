@@ -283,20 +283,24 @@ int histsz(void)
 static void set_postscript(const char* devname)
 {
 	char fname[128];
-	snprintf( fname, sizeof(fname), "/sys/class/block/%s/device/model", devname );
-	FILE* f = fopen( fname, "rb" );
-	if ( !f )
-	{
-		fprintf(stderr, "Failed to open %s: %s.\n", fname, strerror(errno));
-		exit(2);
-	}
 	char nm[128];
 	memset(nm, 1, sizeof(nm));
-	int l = fread( nm, 1, sizeof(nm), f );
-	if ( l>0 && l<sizeof(nm) && nm[l-1] < 32 )
-		nm[l-1] = 0;
-	fclose(f);
-	
+	snprintf( fname, sizeof(fname), "/sys/class/block/%s/device/model", devname );
+	FILE* f = fopen( fname, "rb" );
+
+	if ( f )
+	{
+		int l = fread( nm, 1, sizeof(nm), f );
+		if ( l>0 && l<sizeof(nm) && nm[l-1] < 32 )
+			nm[l-1] = 0;
+		fclose(f);
+	}
+	else
+	{
+		// We can't determine the model name of this drive, so we'll just display the device name instead.
+		strncpy( nm, devname, sizeof(nm)-1 );
+	}
+
 	snprintf
 	(
 		postscript,
