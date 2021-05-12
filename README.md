@@ -10,8 +10,12 @@ The diskgraph tool will graph disk IO under linux, in a terminal.
 
 Examples:
 
-**$ ./diskgraph nvme0n1**
+**$ ./diskgraph /dev/nvme0n1**
 
+
+**$ ./diskgraph /dev/sda**
+
+You can also leave out the `dev` prefix and do:
 
 **$ ./diskgraph sda**
 

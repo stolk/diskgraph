@@ -327,6 +327,8 @@ int main( int argc, char* argv[] )
 		exit(1);
 	}
 	const char* devname = argv[1];
+	if ( !strncmp( devname, "/dev/", 5 ) )
+		devname += 5;
 	char fname[128];
 	snprintf( fname, sizeof(fname), "/sys/block/%s/stat", devname );
 	FILE* f = fopen(fname, "rb");
