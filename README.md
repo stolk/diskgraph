@@ -36,4 +36,4 @@ Press ESCAPE or Q to exit diskgraph.
 ## Copyright
 
 diskgraph is (c)2021 by Bram Stolk and licensed under the MIT license.
-
+Thank you to PQCraft for improving resize functionality and other changes.

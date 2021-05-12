@@ -11,11 +11,8 @@
 #include <string.h>
 #include <inttypes.h>
 #include <signal.h>
-
-#ifndef _WIN32
 #include <termios.h>
 #include <sys/ioctl.h>
-#endif
 
 static int termw = 0, termh = 0;
 static int doubleres = 0;
@@ -34,33 +31,6 @@ static int resized = 1;
 static double period = 0;
 
 
-#ifdef _WIN32
-#	include <windows.h>
-static void get_terminal_size(void)
-{
-	const HANDLE hStdout = GetStdHandle( STD_OUTPUT_HANDLE );
-	CONSOLE_SCREEN_BUFFER_INFO info;
-	GetConsoleScreenBufferInfo( hStdout, &info );
-	termw = info.dwSize.X;
-	termh = info.dwSize.Y;
-	if ( !termw ) termw = 80;
-}
-static int oldcodepage=0;
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
-static void set_console_mode(void)
-{
-	DWORD mode = 0;
-	const HANDLE hStdout = GetStdHandle( STD_OUTPUT_HANDLE );
-	GetConsoleMode( hStdout, &mode );
-	mode = mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	SetConsoleMode( hStdout, mode );
-	oldcodepage = GetConsoleCP();
-	SetConsoleCP( 437 );
-	doubleres = 1;
-}
-#else
 static void get_terminal_size(void)
 {
 	struct winsize tmp;
@@ -68,11 +38,12 @@ static void get_terminal_size(void)
 	termw = tmp.ws_col;
 	termh = tmp.ws_row;
 }
+
+
 static void set_console_mode()
 {
 	doubleres = 1;
 }
-#endif
 
 
 // History of statistics.
@@ -114,39 +85,15 @@ static void setup_image(void)
 }
 
 
-static void setup_legend(void)
-{
-#if 0
-	// Set up the legend.
-	char label_bas[16];
-	char label_min[16];
-	char label_max[16];
-	snprintf( label_bas, sizeof(label_bas), "%3.1f", 10 / 1000000.0f );
-	snprintf( label_min, sizeof(label_min), "%3.1f", 1000 / 1000000.0f );
-	snprintf( label_max, sizeof(label_max), "%3.1f", 100000 / 1000000.0f );
-	int y = 1; int x = 1;
-	sprintf( legend + y * imw + x, "%s", label_max );
-	if ( freq_bas[0] != freq_max[0] )
-	{
-		y = (imh/2) - (barh/2) * freq_bas[0] / (float) freq_max[0];
-		sprintf( legend + y * imw + x, "%s", label_bas );
-	}
-	y = (imh/2) - (barh/2) * freq_min[0] / (float) freq_max[0];
-	sprintf( legend + y * imw + x, "%s", label_min );
-#endif
-}
-
-
 static void sigwinchHandler(int sig)
 {
 	resized = 1;
 }
 
-#ifndef _WIN32
-static struct termios orig_termios;
-#endif
 
-#ifndef _WIN32
+static struct termios orig_termios;
+
+
 void disableRawMode()
 {
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -163,10 +110,7 @@ void enableRawMode()
 	raw.c_cc[VTIME] = 0;				// No waiting time.
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
-#else
-void disableRawMode() {}
-void enableRawMode() {}
-#endif
+
 
 #define RESETALL  	"\x1b[0m"
 
@@ -179,11 +123,8 @@ void enableRawMode() {}
 #define SETBG		"\x1b[48;2;"
 
 
-#ifdef _WIN32
-#	define HALFBLOCK "\xdf"		// Uses IBM PC Codepage 437 char 223
-#else
-#	define HALFBLOCK "▀"		// Uses Unicode char U+2580
-#endif
+#define HALFBLOCK "▀"		// Uses Unicode char U+2580
+
 
 // Note: image has alpha pre-multied. Mimic GL_ONE + GL_ONE_MINUS_SRC_ALPHA
 #define BLEND \
@@ -194,6 +135,7 @@ void enableRawMode() {}
 	g = ( g * t0 + termbg[1] * t1 ) / 255; \
 	b = ( b * t0 + termbg[2] * t1 ) / 255; \
 }
+
 
 static void print_image_double_res( int w, int h, unsigned char* data, char* legend )
 {
@@ -291,9 +233,6 @@ void get_stats( char* fname )
 
 	period = 0.001 * elapsed_ms_since_last_call();
 	period = period < 0.001 ? 1 : period;
-
-	//fclose(f);
-	//f = 0;
 
 	uint32_t v[15];
 	int numv = sscanf
@@ -410,14 +349,13 @@ int main( int argc, char* argv[] )
 	enableRawMode();
 
 	// Listen to changes in terminal size
-	#ifndef _WIN32
 	struct sigaction sa;
 	sigemptyset( &sa.sa_mask );
 	sa.sa_flags = 0;
 	sa.sa_handler = sigwinchHandler;
 	if ( sigaction( SIGWINCH, &sa, 0 ) == -1 )
 		perror( "sigaction" );
-	#endif
+
 	int done = 0;
 	while ( !done )
 	{
@@ -429,7 +367,6 @@ int main( int argc, char* argv[] )
 			printf(CLEARSCREEN);
 			get_terminal_size();
 			setup_image();
-			setup_legend();
 			resized = 0;
 		}
 		#endif
@@ -510,13 +447,7 @@ int main( int argc, char* argv[] )
 		printf( CURSORHOME );
 		print_image_double_res( imw, imh, (unsigned char*) im, legend );
 
-#if 0
-		printf( SETFG "%d;%d;%dm" SETBG "%d;%d;%dm%s", 0x00,0xc0,0x00, 0,0,0, "RD " );
-		printf( SETFG "%d;%d;%dm" SETBG "%d;%d;%dm%s", 0xc0,0x00,0x00, 0,0,0, "WR " );
-		printf( SETFG "%d;%d;%dm" SETBG "%d;%d;%dm%s", 0xb0,0x60,0x00, 0,0,0, "INFLIGHT" );
-#else
 		printf( "%s", postscript );
-#endif
 		fflush( stdout );
 
 		const int NS_PER_MS = 1000000;
@@ -526,9 +457,6 @@ int main( int argc, char* argv[] )
 
 	free(im);
 
-#ifdef _WIN32
-	SetConsoleCP( oldcodepage );
-#endif
 	printf( CLEARSCREEN );
 
 	return 0;
