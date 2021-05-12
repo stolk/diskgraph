@@ -24,7 +24,7 @@ It also shows (in orange) the number of operations that are in-flight at the mom
 
 ## Keys
 
-Press ESCAPE to stop diskgraph.
+Press ESCAPE or Q to exit diskgraph.
 
 ## Known issues
 
