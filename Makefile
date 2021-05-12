@@ -1,7 +1,7 @@
 CC ?= cc
-CFLAGS = -D_POSIX_C_SOURCE=199309L -std=c99 -Wall
-CXXFLAGS =
-LDFLAGS =
+CFLAGS += -D_POSIX_C_SOURCE=199309L -std=c99 -Wall
+CXXFLAGS +=
+LDFLAGS +=
 
 TARGET = diskgraph
 SRC = diskgraph.c
