@@ -82,7 +82,7 @@ measurement_t hist[ MAXHIST ];
 uint32_t head=0;
 uint32_t tail=0;
 
-uint32_t maxbw=8192;	// top of the left-hand scale: bandwidth in sectors per second.
+uint64_t maxbw=8192;	// top of the left-hand scale: bandwidth in sectors per second.
 uint32_t maxif=16;	// top of the right-hand scale: operation count.
 
 
@@ -430,8 +430,10 @@ int main( int argc, char* argv[] )
 		int overflow_bw=0;
 		int overflow_if=0;
 
-		uint32_t quarter_bw = maxbw * 512 / ( 4 * 1024 * 1024 );	// A quarter of the max bandwidth, in bytes/sec.
-		uint32_t quarter_if = maxif / 4;				// A quarter of the max operations count.
+		uint32_t quarter_bw = (uint32_t) ( maxbw * 512UL / ( 4UL * 1024 * 1024 ) );	// A quarter of the max bandwidth, in bytes/sec.
+		uint32_t quarter_if = maxif / 4;						// A quarter of the max operations count.
+
+		assert( quarter_bw > 0 );
 
 		snprintf( legend + imw*(      1) + 1, 80, "%d MeB/s", 4*quarter_bw );
 		snprintf( legend + imw*(imh/8*1) + 1, 80, "%d MeB/s", 3*quarter_bw );
@@ -485,7 +487,9 @@ int main( int argc, char* argv[] )
 				}
 			}
 		}
+
 		if ( overflow_bw ) maxbw *= 2;
+
 		if ( overflow_if ) maxif *= 2;
 
 		get_stats(fname);
