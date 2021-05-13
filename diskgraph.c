@@ -385,9 +385,6 @@ int main( int argc, char* argv[] )
 	int done = 0;
 	while ( !done )
 	{
-		#ifdef _WIN32
-		get_terminal_size();
-		#else
 		if ( resized )
 		{
 			printf(CLEARSCREEN);
@@ -395,7 +392,6 @@ int main( int argc, char* argv[] )
 			setup_image();
 			resized = 0;
 		}
-		#endif
 
 		char c;
 		const int numr = read( STDIN_FILENO, &c, 1 );

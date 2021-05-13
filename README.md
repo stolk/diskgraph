@@ -36,6 +36,7 @@ Press ESCAPE or Q to exit diskgraph.
 * Does not work on older linux kernels.
 * Missing manual page.
 * Assumes 512 byte sectors.
+* Uses a lot of bandwidth when used over network, due to frequent screen-redraws. To mitigate: use small term size.
 
 ## Copyright
 
