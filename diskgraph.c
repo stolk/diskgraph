@@ -65,7 +65,7 @@ static void setup_image(void)
 
 	imw = termw;
 	imh = 2 * (termh-1);
-	const size_t sz = imw * imh * 4;
+	const size_t sz = 4ull * imw * imh;
 	im = (uint32_t*) malloc(sz);
 	memset( im, 0x00, sz );
 
