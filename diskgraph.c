@@ -35,7 +35,14 @@ static double period = 0;
 static void get_terminal_size(void)
 {
 	struct winsize tmp;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &tmp);
+	memset(&tmp, 0, sizeof(tmp));
+	const int rv = ioctl(STDIN_FILENO, TIOCGWINSZ, &tmp);
+	if (rv<0)
+	{
+		perror("ioctl TIOCGWINSZ");
+		fprintf(stderr,"Not running in a terminal.\n");
+		exit(4);
+	}
 	termw = tmp.ws_col;
 	termh = tmp.ws_row;
 }
