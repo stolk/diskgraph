@@ -1,0 +1,15 @@
+Source: diskgraph
+Section: contrib/utils
+Priority: optional
+Maintainer: Bram Stolk <bram.stolk@canonical.com>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13)
+Standards-Version: 4.6.1
+Homepage: https://github.com/stolk/diskgraph
+
+Package: diskgraph
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Graphs live view of R/W bandwidth of a disk drive.
+ Shows a live graph of the R/W bandwidth of a disk drive along with how many IO operations are in flight.
