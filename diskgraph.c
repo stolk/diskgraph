@@ -95,6 +95,7 @@ static void setup_image(void)
 
 static void sigwinchHandler(int sig)
 {
+	(void)sig;
 	resized = 1;
 }
 
@@ -307,7 +308,7 @@ static void set_postscript(const char* devname)
 
 	if ( f )
 	{
-		int l = fread( nm, 1, sizeof(nm), f );
+		const size_t l = fread( nm, 1, sizeof(nm), f );
 		if ( l>0 && l<sizeof(nm) && nm[l-1] < 32 )
 			nm[l-1] = 0;
 		fclose(f);
@@ -394,6 +395,7 @@ int main( int argc, char* argv[] )
 	{
 		if ( resized )
 		{
+			printf(SETBG "0;0;0m");
 			printf(CLEARSCREEN);
 			get_terminal_size();
 			setup_image();
@@ -433,9 +435,9 @@ int main( int argc, char* argv[] )
 		snprintf( legend + imw * (imh / 8 * 2) + (imw-1-strlen(lab2)), 80, "%s", lab2 );
 		snprintf( legend + imw * (imh / 8 * 3) + (imw-1-strlen(lab3)), 80, "%s", lab3 );
 
-		for ( uint32_t i = 1; i<imh-1; ++i )
+		for ( int32_t i = 1; i<imh-1; ++i )
 		{
-			for ( uint32_t j = 0; j<imw-2; ++j )
+			for ( int32_t j = 0; j<imw-2; ++j )
 			{
 				if ( j<hsz )
 				{
@@ -448,7 +450,7 @@ int main( int argc, char* argv[] )
 					h = h < 0 ? h + MAXHIST : h;
 					uint32_t rd = hist[h][0];
 					uint32_t wr = hist[h][1];
-					int op = hist[h][2];
+					uint32_t op = hist[h][2];
 					uint32_t x = imw-2-j;
 					uint32_t y = imh-1-i;
 					uint32_t rd_l = rd * imh / maxbw;
@@ -459,9 +461,9 @@ int main( int argc, char* argv[] )
 					if ( op > maxif )
 						overflow_if = 1;
 					uint32_t c = (a<<24);
-					if ( i == rd_l ) c = c_g;
-					if ( i == wr_l ) c = c_r;
-					if ( i == op_l ) c = c_o;
+					if ( i == (int)rd_l ) c = c_g;
+					if ( i == (int)wr_l ) c = c_r;
+					if ( i == (int)op_l ) c = c_o;
 					im[ y * imw + x ] = c;
 				}
 			}
@@ -486,6 +488,7 @@ int main( int argc, char* argv[] )
 
 	free(im);
 
+	printf( RESETALL );
 	printf( CLEARSCREEN );
 
 	return 0;
