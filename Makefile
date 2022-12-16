@@ -1,5 +1,5 @@
 CC ?= cc
-CFLAGS += -D_POSIX_C_SOURCE=199309L -std=c99 -Wall
+CFLAGS += -D_POSIX_C_SOURCE=199309L -std=c99 -Wall -Wextra
 LDFLAGS +=
 
 TARGET = diskgraph
@@ -35,10 +35,10 @@ uninstall:
 	rm -f ${DESTDIR}/usr/bin/distgraph
 
 tarball:
-	tar cvzf ../diskgraph_1.0.orig.tar.gz $(DISTFILES)
+	tar cvzf ../diskgraph_1.1.orig.tar.gz $(DISTFILES)
 
 packageupload:
 	debuild -S
-	debsign ../diskgraph_1.0-1_source.changes
-	dput ppa:b-stolk/ppa ../diskgraph_1.0-1_source.changes
+	debsign ../diskgraph_1.1-1_source.changes
+	dput ppa:b-stolk/ppa ../diskgraph_1.1-1_source.changes
 
