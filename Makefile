@@ -35,10 +35,10 @@ uninstall:
 	rm -f ${DESTDIR}/usr/bin/distgraph
 
 tarball:
-	tar cvzf ../diskgraph_1.1.orig.tar.gz $(DISTFILES)
+	tar cvzf ../diskgraph_1.2.orig.tar.gz $(DISTFILES)
 
 packageupload:
 	debuild -S
-	debsign ../diskgraph_1.1-1_source.changes
-	dput ppa:b-stolk/ppa ../diskgraph_1.1-1_source.changes
+	debsign ../diskgraph_1.2-1_source.changes
+	dput --force ppa:b-stolk/ppa ../diskgraph_1.2-1_source.changes
 
