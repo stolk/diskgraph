@@ -7,25 +7,16 @@ MANPAGE = $(TARGET).1
 SRC = diskgraph.c
 OBJ = $(SRC:.c=.o)
 
-# Installation paths
-PREFIX ?= /usr/local
-BINDIR = $(PREFIX)/bin
-MANDIR = $(PREFIX)/share/man/man1
+DISTFILES=\
+Makefile \
+diskgraph.c \
+diskgraph.1 \
+README.md \
+LICENSE \
+images \
+completions \
+debian
 
-# Distribution files
-DISTFILES = \
-	Makefile \
-	$(SRC) \
-	$(MANPAGE) \
-	README.md \
-	LICENSE \
-	images \
-	debian
-
-# Version for Debian packaging
-VERSION = 1.2
-DEB_RELEASE = 1
-PPA = ppa:b-stolk/ppa
 
 .PHONY: all clean install uninstall tarball packageupload
 
@@ -41,21 +32,27 @@ clean:
 	rm -f $(OBJ) $(TARGET)
 	@echo All clean
 
-install: $(TARGET)
-	install -d $(DESTDIR)$(BINDIR)
-	install -d $(DESTDIR)$(MANDIR)
-	install -m 755 $(TARGET) $(DESTDIR)$(BINDIR)/
-	install -m 644 $(MANPAGE) $(DESTDIR)$(MANDIR)/
+install: diskgraph
+	install -d ${DESTDIR}/usr/bin
+	install -m 755 diskgraph ${DESTDIR}/usr/bin/
+	install -d ${DESTDIR}/usr/share/bash-completion/completions
+	install -m 644 completions/bash/diskgraph ${DESTDIR}/usr/share/bash-completion/completions/
+	install -d ${DESTDIR}/usr/share/zsh/vendor-completions
+	install -m 644 completions/zsh/_diskgraph ${DESTDIR}/usr/share/zsh/vendor-completions/
+	install -d ${DESTDIR}/usr/share/fish/vendor_completions.d
+	install -m 644 completions/fish/diskgraph.fish ${DESTDIR}/usr/share/fish/vendor_completions.d/
 
 uninstall:
-	rm -f $(DESTDIR)$(BINDIR)/$(TARGET)
-	rm -f $(DESTDIR)$(MANDIR)/$(MANPAGE)
+	rm -f ${DESTDIR}/usr/bin/diskgraph
+	rm -f ${DESTDIR}/usr/share/bash-completion/completions/diskgraph
+	rm -f ${DESTDIR}/usr/share/zsh/vendor-completions/_diskgraph
+	rm -f ${DESTDIR}/usr/share/fish/vendor_completions.d/diskgraph.fish
 
 tarball:
-	@echo Creating tarball in parent directory (required for Debian packaging)...
-	tar cvzf ../$(TARGET)_$(VERSION).orig.tar.gz $(DISTFILES)
+	tar cvzf ../diskgraph_1.3.orig.tar.gz $(DISTFILES)
 
 packageupload:
 	debuild -S
-	debsign ../$(TARGET)_$(VERSION)-$(DEB_RELEASE)_source.changes
-	dput --force $(PPA) ../$(TARGET)_$(VERSION)-$(DEB_RELEASE)_source.changes
+	debsign ../diskgraph_1.3-1_source.changes
+	dput --force ppa:b-stolk/ppa ../diskgraph_1.2-1_source.changes
+

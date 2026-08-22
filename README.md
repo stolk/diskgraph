@@ -30,12 +30,15 @@ It also shows (in orange) the number of operations that are in-flight at the mom
 
 Press ESCAPE or Q to exit diskgraph.
 
+## Shell completion
+
+Tab completion for block device names is installed for bash, zsh and fish
+when diskgraph is installed system-wide (the scripts read /sys/block).
+
 ## Known issues
 
 * Shows garbage on terminals that do not support 24 bit colour.
 * Does not work on older linux kernels.
-* Missing manual page.
-* Assumes 512 byte sectors.
 * Uses a lot of bandwidth when used over network, due to frequent screen-redraws. To mitigate: use small term size.
 
 ## Copyright

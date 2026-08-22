@@ -31,6 +31,31 @@ static int resized = 1;
 
 static double period = 0;
 
+static uint32_t sector_size = 512;
+
+
+static void get_sector_size(const char* devname)
+{
+	char fname[128];
+	snprintf( fname, sizeof(fname), "/sys/block/%s/queue/logical_block_size", devname );
+	FILE* f = fopen( fname, "rb" );
+	if ( !f )
+	{
+		fprintf(stderr, "Failed to open %s: %s. Assuming 512 byte sectors.\n", fname, strerror(errno));
+		return;
+	}
+	char buf[32];
+	const size_t n = fread( buf, 1, sizeof(buf) - 1, f );
+	fclose(f);
+	if ( n > 0 )
+	{
+		buf[n] = 0;
+		const long sz = strtol( buf, 0, 10 );
+		if ( sz > 0 )
+			sector_size = (uint32_t) sz;
+	}
+}
+
 
 static void get_terminal_size(void)
 {
@@ -363,6 +388,9 @@ int main( int argc, char* argv[] )
 
 	get_stats( fname );
 
+	get_sector_size( devname );
+	maxbw = 4UL * 1024 * 1024 / sector_size;
+
 	set_postscript( devname );
 
 	// Parse environment variable for terminal background colour.
@@ -423,7 +451,7 @@ int main( int argc, char* argv[] )
 		int overflow_bw = 0;
 		int overflow_if = 0;
 
-		uint32_t quarter_bw = (uint32_t) ( maxbw * 512UL / ( 4UL * 1024 * 1024 ) );	// A quarter of the max bandwidth, in bytes/sec.
+		uint32_t quarter_bw = (uint32_t) ( maxbw * (uint64_t)sector_size / ( 4UL * 1024 * 1024 ) );
 		uint32_t quarter_if = maxif / 4;						// A quarter of the max operations count.
 
 		assert( quarter_bw > 0 );

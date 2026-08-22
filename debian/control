@@ -11,5 +11,6 @@ Homepage: https://github.com/stolk/diskgraph
 Package: diskgraph
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: bash-completion
 Description: Graphs live view of R/W bandwidth of a disk drive.
  Shows a live graph of the R/W bandwidth of a disk drive along with how many IO operations are in flight.
