@@ -1,0 +1,9 @@
+_diskgraph()
+{
+	local cur
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	if [[ ${#COMP_WORDS[@]} -eq 2 ]]; then
+		COMPREPLY=( $(compgen -W "$(ls /sys/block 2>/dev/null)" -- "$cur") )
+	fi
+}
+complete -F _diskgraph diskgraph
