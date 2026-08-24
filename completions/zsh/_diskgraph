@@ -1,0 +1,6 @@
+#compdef diskgraph
+
+local devices
+devices=($(ls /sys/block 2>/dev/null))
+
+_arguments '*:device:(${devices})'
